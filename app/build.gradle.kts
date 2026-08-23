@@ -14,8 +14,8 @@ android {
         minSdk = 23
         targetSdk = 37
 
-        versionCode = 2
-        versionName = "1.2"
+        versionCode = 5
+        versionName = "1.5"
     }
 
     buildFeatures {
@@ -32,6 +32,9 @@ android {
         release {
             optimization {
                 enable = true // Enables code and resource optimizations.
+            }
+            ndk {
+                debugSymbolLevel = "FULL"
             }
         }
     }
