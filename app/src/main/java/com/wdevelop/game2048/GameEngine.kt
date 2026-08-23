@@ -19,6 +19,11 @@ object GameEngine {
         return tiles
     }
 
+    fun restoreGame(tiles: List<TileModel>) {
+        val maxId = tiles.maxOfOrNull { it.id } ?: 0L
+        nextId = maxId + 1
+    }
+
     fun move(
         tiles: List<TileModel>,
         direction: Direction

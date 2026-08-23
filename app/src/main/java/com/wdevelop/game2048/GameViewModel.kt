@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import com.wdevelop.game2048.data.Achievement
 import com.wdevelop.game2048.data.AchievementDatabase
+import com.wdevelop.game2048.ui.SoundManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,8 @@ class GameViewModel(
     private val database =
         AchievementDatabase(application)
 
+    private val soundManager = SoundManager(application)
+
     private val _state =
         MutableStateFlow(initialState())
 
@@ -29,16 +32,24 @@ class GameViewModel(
         _state.asStateFlow()
 
     private fun initialState(): GameState {
-        return GameState(
-            tiles = GameEngine.createNewGame(),
-            score = 0,
-            bestScore = loadBestScore(),
-            soundEnabled =
-                preferences.getBoolean(
-                    KEY_SOUND,
-                    true
-                )
-        )
+        val savedTiles = database.loadSavedTiles()
+        return if (savedTiles != null) {
+            GameEngine.restoreGame(savedTiles)
+            GameState(
+                tiles = savedTiles,
+                score = database.loadSavedScore(),
+                bestScore = loadBestScore(),
+                winAlreadyShown = database.loadWinShown(),
+                soundEnabled = preferences.getBoolean(KEY_SOUND, true)
+            )
+        } else {
+            GameState(
+                tiles = GameEngine.createNewGame(),
+                score = 0,
+                bestScore = loadBestScore(),
+                soundEnabled = preferences.getBoolean(KEY_SOUND, true)
+            )
+        }
     }
 
     fun move(direction: Direction) {
@@ -59,6 +70,10 @@ class GameViewModel(
             return
         }
 
+        if (current.soundEnabled) {
+            soundManager.playMove()
+        }
+
         val score =
             current.score + result.scoreAdded
 
@@ -77,27 +92,40 @@ class GameViewModel(
                 result.tiles,
                 score
             )
+            if (current.soundEnabled) {
+                soundManager.playGameOver()
+            }
         }
 
         val showWin =
             result.reached2048 &&
                 !current.winAlreadyShown
+        
+        if (showWin && current.soundEnabled) {
+            soundManager.playWin()
+        }
 
-        _state.value =
-            current.copy(
-                tiles = result.tiles,
-                score = score,
-                bestScore = best,
-                isGameOver = isGameOver,
-                showWinDialog = showWin,
-                winAlreadyShown =
-                    current.winAlreadyShown ||
-                        result.reached2048
-            )
+        val nextState = current.copy(
+            tiles = result.tiles,
+            score = score,
+            bestScore = best,
+            isGameOver = isGameOver,
+            showWinDialog = showWin,
+            winAlreadyShown = current.winAlreadyShown || result.reached2048
+        )
+
+        _state.value = nextState
+        database.saveGame(nextState.tiles, nextState.score, nextState.winAlreadyShown)
     }
 
-    fun newGame() {
+    override fun onCleared() {
+        super.onCleared()
+        soundManager.release()
+    }
 
+
+    fun newGame() {
+        database.clearSavedGame()
         _state.value =
             GameState(
                 tiles =
