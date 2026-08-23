@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -103,42 +104,43 @@ fun GameBoard(
         }
 
         tiles.forEach { tile ->
-
-            val x =
-                animateDpAsState(
-                    targetValue =
-                        (cellSize + spacing) * tile.column,
-                    animationSpec =
-                        tween(150),
-                    label = "tileX"
-                )
-
-            val y =
-                animateDpAsState(
-                    targetValue =
-                        (cellSize + spacing) * tile.row,
-                    animationSpec =
-                        tween(150),
-                    label = "tileY"
-                )
-
-            Box(
-                modifier = Modifier
-                    .padding(
-                        start = x.value,
-                        top = y.value
+            key(tile.id) {
+                val x =
+                    animateDpAsState(
+                        targetValue =
+                            (cellSize + spacing) * tile.column,
+                        animationSpec =
+                            tween(150),
+                        label = "tileX"
                     )
-                    .size(cellSize)
-                    .zIndex(
-                        if (tile.isMerged) 2f
-                        else 1f
+
+                val y =
+                    animateDpAsState(
+                        targetValue =
+                            (cellSize + spacing) * tile.row,
+                        animationSpec =
+                            tween(150),
+                        label = "tileY"
                     )
-            ) {
-                TileView(
-                    tile = tile,
-                    modifier =
-                        Modifier.fillMaxSize()
-                )
+
+                Box(
+                    modifier = Modifier
+                        .padding(
+                            start = x.value,
+                            top = y.value
+                        )
+                        .size(cellSize)
+                        .zIndex(
+                            if (tile.isMerged) 2f
+                            else 1f
+                        )
+                ) {
+                    TileView(
+                        tile = tile,
+                        modifier =
+                            Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
