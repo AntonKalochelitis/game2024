@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">得分</string>
+    <string name="best_score_label">最高分</string>
+    <string name="new_game_button">新游戏</string>
+    <string name="settings_title">设置</string>
+    <string name="sound_label">声音</string>
+    <string name="rate_us_button">评价我们！</string>
+    <string name="achievements_label">成就</string>
+    <string name="victory_title">胜利！</string>
+    <string name="victory_message">你收集到了 2048 方块！</string>
+    <string name="continue_button">继续</string>
+    <string name="restart_button">重新开始</string>
+    <string name="game_over_title">游戏结束</string>
+    <string name="game_over_message">没有可移动的方块了。</string>
+</resources>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">PUNTOS</string>
+    <string name="best_score_label">MEJOR</string>
+    <string name="new_game_button">NUEVA PARTIDA</string>
+    <string name="settings_title">AJUSTES</string>
+    <string name="sound_label">Sonido</string>
+    <string name="rate_us_button">¡VALÓRANOS!</string>
+    <string name="achievements_label">LOGROS</string>
+    <string name="victory_title">¡VICTORIA!</string>
+    <string name="victory_message">¡Has conseguido la ficha 2048!</string>
+    <string name="continue_button">CONTINUAR</string>
+    <string name="restart_button">REINTENTAR</string>
+    <string name="game_over_title">FIN DEL JUEGO</string>
+    <string name="game_over_message">No hay más movimientos disponibles.</string>
+</resources>

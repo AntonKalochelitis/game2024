@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2048</string>
+    <string name="score_label">ОЧКИ</string>
+    <string name="best_score_label">ЛУЧШИЙ</string>
+    <string name="new_game_button">НОВАЯ ИГРА</string>
+    <string name="settings_title">НАСТРОЙКИ</string>
+    <string name="sound_label">Звук</string>
+    <string name="rate_us_button">ОЦЕНИТЕ НАС!</string>
+    <string name="achievements_label">ДОСТИЖЕНИЯ</string>
+    <string name="victory_title">ПОБЕДА!</string>
+    <string name="victory_message">Вы собрали плитку 2048!</string>
+    <string name="continue_button">ПРОДОЛЖИТЬ</string>
+    <string name="restart_button">ЗАНОВО</string>
+    <string name="game_over_title">ИГРА ОКОНЧЕНА</string>
+    <string name="game_over_message">Доступных ходов больше нет.</string>
+    <string name="settings_close_desc">Закрыть</string>
+    <string name="settings_gear_desc">Настройки</string>
+    <string name="new_game_desc">Новая игра</string>
+    <string name="ach_1_title">Первая сотня</string>
+    <string name="ach_1_desc">Создайте плитку 128</string>
+    <string name="ach_2_title">Уверенная игра</string>
+    <string name="ach_2_desc">Создайте плитку 256</string>
+    <string name="ach_3_title">Сильный игрок</string>
+    <string name="ach_3_desc">Создайте плитку 512</string>
+    <string name="ach_4_title">Профессионал</string>
+    <string name="ach_4_desc">Создайте плитку 1024</string>
+    <string name="ach_5_title">Мастер 2048</string>
+    <string name="ach_5_desc">Соберите плитку 2048</string>
+    <string name="ach_6_title">Мастер очков</string>
+    <string name="ach_6_desc">Наберите 10000 очков</string>
+</resources>

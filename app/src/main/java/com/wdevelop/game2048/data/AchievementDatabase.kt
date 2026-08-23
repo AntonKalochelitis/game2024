@@ -38,33 +38,33 @@ class AchievementDatabase(
         val achievements = listOf(
             Triple(
                 1,
-                "Первая сотня",
-                "Создайте плитку 128"
+                "ach_1_title",
+                "ach_1_desc"
             ),
             Triple(
                 2,
-                "Уверенная игра",
-                "Создайте плитку 256"
+                "ach_2_title",
+                "ach_2_desc"
             ),
             Triple(
                 3,
-                "Сильный игрок",
-                "Создайте плитку 512"
+                "ach_3_title",
+                "ach_3_desc"
             ),
             Triple(
                 4,
-                "Профессионал",
-                "Создайте плитку 1024"
+                "ach_4_title",
+                "ach_4_desc"
             ),
             Triple(
                 5,
-                "2048",
-                "Соберите плитку 2048"
+                "ach_5_title",
+                "ach_5_desc"
             ),
             Triple(
                 6,
-                "Мастер очков",
-                "Наберите 10000 очков"
+                "ach_6_title",
+                "ach_6_desc"
             )
         )
 

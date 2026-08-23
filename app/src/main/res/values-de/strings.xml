@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">PUNKTE</string>
+    <string name="best_score_label">BESTE</string>
+    <string name="new_game_button">NEUES SPIEL</string>
+    <string name="settings_title">EINSTELLUNGEN</string>
+    <string name="sound_label">Ton</string>
+    <string name="rate_us_button">BEWERTE UNS!</string>
+    <string name="achievements_label">ERFOLGE</string>
+    <string name="victory_title">SIEG!</string>
+    <string name="victory_message">Du hast den 2048er Stein gesammelt!</string>
+    <string name="continue_button">WEITER</string>
+    <string name="restart_button">NEUSTART</string>
+    <string name="game_over_title">SPIEL VORBEI</string>
+    <string name="game_over_message">Keine Züge mehr möglich.</string>
+</resources>

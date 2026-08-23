@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">スコア</string>
+    <string name="best_score_label">ベスト</string>
+    <string name="new_game_button">新しく始める</string>
+    <string name="settings_title">設定</string>
+    <string name="sound_label">音</string>
+    <string name="rate_us_button">評価する</string>
+    <string name="achievements_label">実績</string>
+    <string name="victory_title">勝利！</string>
+    <string name="victory_message">2048タイルを手に入れました！</string>
+    <string name="continue_button">続ける</string>
+    <string name="restart_button">やり直す</string>
+    <string name="game_over_title">ゲームオーバー</string>
+    <string name="game_over_message">動かせるタイルがありません。</string>
+</resources>

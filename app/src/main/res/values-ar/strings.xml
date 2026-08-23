@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">النقاط</string>
+    <string name="best_score_label">الأفضل</string>
+    <string name="new_game_button">لعبة جديدة</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="sound_label">الصوت</string>
+    <string name="rate_us_button">قيمنا!</string>
+    <string name="achievements_label">الإنجازات</string>
+    <string name="victory_title">فوز!</string>
+    <string name="victory_message">لقد جمعت بلاطة 2048!</string>
+    <string name="continue_button">استمرار</string>
+    <string name="restart_button">إعادة المحاولة</string>
+    <string name="game_over_title">انتهت اللعبة</string>
+    <string name="game_over_message">لا توجد حركات متاحة.</string>
+</resources>

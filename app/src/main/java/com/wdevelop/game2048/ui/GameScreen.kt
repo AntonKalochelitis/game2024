@@ -30,10 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wdevelop.game2048.GameViewModel
+import com.wdevelop.game2048.R
 
 @Composable
 fun GameScreen(
@@ -139,7 +141,7 @@ fun GameScreen(
             )
 
             Text(
-                text = "  НОВАЯ ИГРА"
+                text = "  " + stringResource(R.string.new_game_button)
             )
         }
     }
@@ -200,7 +202,7 @@ private fun Header(
                 imageVector =
                     Icons.Default.Settings,
                 contentDescription =
-                    "Настройки",
+                    stringResource(R.string.settings_gear_desc),
                 tint =
                     GameColors.Primary,
                 modifier =
@@ -218,7 +220,7 @@ private fun Header(
                 imageVector =
                     Icons.Default.Add,
                 contentDescription =
-                    "Новая игра",
+                    stringResource(R.string.new_game_desc),
                 tint =
                     GameColors.Primary,
                 modifier =
@@ -242,14 +244,14 @@ private fun ScorePanel(
     ) {
 
         ScoreCard(
-            title = "ОЧКИ",
+            title = stringResource(R.string.score_label),
             value = score,
             modifier =
                 Modifier.weight(1f)
         )
 
         ScoreCard(
-            title = "ЛУЧШИЙ",
+            title = stringResource(R.string.best_score_label),
             value = best,
             modifier =
                 Modifier.weight(1f)
@@ -305,20 +307,18 @@ private fun WinDialog(
         onDismissRequest = onContinue,
 
         title = {
-            Text("ПОБЕДА!")
+            Text(stringResource(R.string.victory_title))
         },
 
         text = {
-            Text(
-                "Вы собрали плитку 2048!"
-            )
+            Text(stringResource(R.string.victory_message))
         },
 
         confirmButton = {
             Button(
                 onClick = onContinue
             ) {
-                Text("ПРОДОЛЖИТЬ")
+                Text(stringResource(R.string.continue_button))
             }
         },
 
@@ -326,7 +326,7 @@ private fun WinDialog(
             Button(
                 onClick = onRestart
             ) {
-                Text("ЗАНОВО")
+                Text(stringResource(R.string.restart_button))
             }
         }
     )
@@ -341,20 +341,18 @@ private fun GameOverDialog(
         onDismissRequest = {},
 
         title = {
-            Text("ИГРА ОКОНЧЕНА")
+            Text(stringResource(R.string.game_over_title))
         },
 
         text = {
-            Text(
-                "Доступных ходов больше нет."
-            )
+            Text(stringResource(R.string.game_over_message))
         },
 
         confirmButton = {
             Button(
                 onClick = onRestart
             ) {
-                Text("ЗАНОВО")
+                Text(stringResource(R.string.restart_button))
             }
         }
     )

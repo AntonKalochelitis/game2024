@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">分數</string>
+    <string name="best_score_label">最高分</string>
+    <string name="new_game_button">新遊戲</string>
+    <string name="settings_title">設定</string>
+    <string name="sound_label">聲音</string>
+    <string name="rate_us_button">評價我們！</string>
+    <string name="achievements_label">成就</string>
+    <string name="victory_title">勝利！</string>
+    <string name="victory_message">你集齊了 2048 方塊！</string>
+    <string name="continue_button">繼續</string>
+    <string name="restart_button">重新開始</string>
+    <string name="game_over_title">遊戲結束</string>
+    <string name="game_over_message">沒有更多可移動的方塊。</string>
+    <string name="settings_close_desc">關閉</string>
+    <string name="settings_gear_desc">設定</string>
+    <string name="new_game_desc">新遊戲</string>
+    <string name="ach_1_title">第一個一百</string>
+    <string name="ach_1_desc">創建 128 方塊</string>
+    <string name="ach_2_title">穩定的遊戲</string>
+    <string name="ach_2_desc">創建 256 方塊</string>
+    <string name="ach_3_title">強力玩家</string>
+    <string name="ach_3_desc">創建 512 方塊</string>
+    <string name="ach_4_title">專業玩家</string>
+    <string name="ach_4_desc">創建 1024 方塊</string>
+    <string name="ach_5_title">2048 大師</string>
+    <string name="ach_5_desc">集齊 2048 方塊</string>
+    <string name="ach_6_title">分數大師</string>
+    <string name="ach_6_desc">達到 10000 分</string>
+</resources>

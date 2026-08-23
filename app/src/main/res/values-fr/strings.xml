@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="score_label">SCORE</string>
+    <string name="best_score_label">MEILLEUR</string>
+    <string name="new_game_button">NOUVELLE PARTIE</string>
+    <string name="settings_title">PARAMÈTRES</string>
+    <string name="sound_label">Son</string>
+    <string name="rate_us_button">ÉVALUEZ-NOUS !</string>
+    <string name="achievements_label">SUCCÈS</string>
+    <string name="victory_title">VICTOIRE !</string>
+    <string name="victory_message">Vous avez collecté la tuile 2048 !</string>
+    <string name="continue_button">CONTINUER</string>
+    <string name="restart_button">RECOMMENCER</string>
+    <string name="game_over_title">PARTIE TERMINÉE</string>
+    <string name="game_over_message">Plus de mouvements possibles.</string>
+</resources>

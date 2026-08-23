@@ -23,7 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.wdevelop.game2048.R
 import com.wdevelop.game2048.data.Achievement
 
 @Composable
@@ -50,7 +52,7 @@ fun SettingsDialog(
             ) {
 
                 Text(
-                    text = "НАСТРОЙКИ",
+                    text = stringResource(R.string.settings_title),
                     modifier =
                         Modifier.weight(1f)
                 )
@@ -62,7 +64,7 @@ fun SettingsDialog(
                         imageVector =
                             Icons.Default.Close,
                         contentDescription =
-                            "Закрыть"
+                            stringResource(R.string.settings_close_desc)
                     )
                 }
             }
@@ -80,7 +82,7 @@ fun SettingsDialog(
                 ) {
 
                     Text(
-                        text = "Звук",
+                        text = stringResource(R.string.sound_label),
                         modifier =
                             Modifier.weight(1f)
                     )
@@ -131,7 +133,7 @@ fun SettingsDialog(
                     )
 
                     Text(
-                        text = "  ОЦЕНИТЕ НАС!"
+                        text = "  " + stringResource(R.string.rate_us_button)
                     )
                 }
 
@@ -143,7 +145,7 @@ fun SettingsDialog(
                 )
 
                 Text(
-                    text = "ДОСТИЖЕНИЯ"
+                    text = stringResource(R.string.achievements_label)
                 )
 
                 LazyColumn {
@@ -171,6 +173,22 @@ fun SettingsDialog(
 private fun AchievementRow(
     achievement: Achievement
 ) {
+    val context = LocalContext.current
+    
+    // Dynamically resolve title and description from resources using the keys stored in DB
+    val title = try {
+        val resId = context.resources.getIdentifier(achievement.title, "string", context.packageName)
+        if (resId != 0) context.getString(resId) else achievement.title
+    } catch (e: Exception) {
+        achievement.title
+    }
+
+    val description = try {
+        val resId = context.resources.getIdentifier(achievement.description, "string", context.packageName)
+        if (resId != 0) context.getString(resId) else achievement.description
+    } catch (e: Exception) {
+        achievement.description
+    }
 
     Row(
         modifier =
@@ -201,11 +219,11 @@ private fun AchievementRow(
         ) {
 
             Text(
-                text = achievement.title
+                text = title
             )
 
             Text(
-                text = achievement.description
+                text = description
             )
         }
     }
