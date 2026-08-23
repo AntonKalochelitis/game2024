@@ -109,7 +109,7 @@ class AchievementDatabase(
             null,
             null,
             null,
-            "id ASC"
+            "id DESC"
         )
 
         cursor.use {
@@ -158,6 +158,11 @@ class AchievementDatabase(
         private const val DATABASE_NAME =
             "game_2048.db"
 
-        private const val DATABASE_VERSION = 1
+        /**
+         * IMPORTANT: If you change the database schema (add, rename, or remove columns/tables),
+         * you MUST increment this version number by 1. This triggers onUpgrade(),
+         * which ensures that existing users receive the updated structure.
+         */
+        private const val DATABASE_VERSION = 2
     }
 }

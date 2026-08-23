@@ -70,10 +70,14 @@ class GameViewModel(
 
         saveBestScore(best)
 
-        unlockAchievements(
-            result.tiles,
-            score
-        )
+        val isGameOver = !GameEngine.canMove(result.tiles)
+
+        if (isGameOver) {
+            unlockAchievements(
+                result.tiles,
+                score
+            )
+        }
 
         val showWin =
             result.reached2048 &&
@@ -84,10 +88,7 @@ class GameViewModel(
                 tiles = result.tiles,
                 score = score,
                 bestScore = best,
-                isGameOver =
-                    !GameEngine.canMove(
-                        result.tiles
-                    ),
+                isGameOver = isGameOver,
                 showWinDialog = showWin,
                 winAlreadyShown =
                     current.winAlreadyShown ||

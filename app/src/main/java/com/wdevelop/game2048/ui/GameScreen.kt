@@ -50,7 +50,9 @@ fun GameScreen(
 
     LaunchedEffect(
         state.score,
-        state.tiles
+        state.tiles,
+        state.isGameOver,
+        state.showSettings
     ) {
         achievements =
             viewModel.getAchievements()
@@ -82,8 +84,13 @@ fun GameScreen(
                 Modifier.height(14.dp)
         )
 
+        val maxTileValue =
+            state.tiles.maxOfOrNull {
+                it.value
+            } ?: 0
+
         Text(
-            text = "2048",
+            text = maxTileValue.toString(),
             color = GameColors.Primary,
             fontSize = 54.sp,
             fontWeight =
