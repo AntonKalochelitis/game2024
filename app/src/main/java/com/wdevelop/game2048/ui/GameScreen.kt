@@ -2,6 +2,7 @@ package com.wdevelop.game2048.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -110,12 +111,12 @@ fun GameScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .aspectRatio(1f)
         )
 
         Spacer(
             modifier =
-                Modifier.height(16.dp)
+                Modifier.weight(1f)
         )
 
         Button(

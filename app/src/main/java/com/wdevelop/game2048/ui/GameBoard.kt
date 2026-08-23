@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -88,11 +89,9 @@ fun GameBoard(
 
                 Box(
                     modifier = Modifier
-                        .padding(
-                            start =
-                                (cellSize + spacing) * column,
-                            top =
-                                (cellSize + spacing) * row
+                        .offset(
+                            x = (cellSize + spacing) * column,
+                            y = (cellSize + spacing) * row
                         )
                         .size(cellSize)
                         .background(
@@ -105,30 +104,25 @@ fun GameBoard(
 
         tiles.forEach { tile ->
             key(tile.id) {
-                val x =
-                    animateDpAsState(
-                        targetValue =
-                            (cellSize + spacing) * tile.column,
-                        animationSpec =
-                            tween(150),
-                        label = "tileX"
-                    )
+                val x by animateDpAsState(
+                    targetValue =
+                        (cellSize + spacing) * tile.column,
+                    animationSpec =
+                        tween(150),
+                    label = "tileX"
+                )
 
-                val y =
-                    animateDpAsState(
-                        targetValue =
-                            (cellSize + spacing) * tile.row,
-                        animationSpec =
-                            tween(150),
-                        label = "tileY"
-                    )
+                val y by animateDpAsState(
+                    targetValue =
+                        (cellSize + spacing) * tile.row,
+                    animationSpec =
+                        tween(150),
+                    label = "tileY"
+                )
 
                 Box(
                     modifier = Modifier
-                        .padding(
-                            start = x.value,
-                            top = y.value
-                        )
+                        .offset(x = x, y = y)
                         .size(cellSize)
                         .zIndex(
                             if (tile.isMerged) 2f
