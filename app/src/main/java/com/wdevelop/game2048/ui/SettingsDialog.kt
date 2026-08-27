@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -24,14 +21,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.wdevelop.game2048.R
-import com.wdevelop.game2048.data.Achievement
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun SettingsDialog(
     soundEnabled: Boolean,
-    achievements: List<Achievement>,
+    maxTile: Int,
+    maxTileDate: Long,
     onSoundChanged: (Boolean) -> Unit,
     onClose: () -> Unit
 ) {
@@ -145,86 +147,37 @@ fun SettingsDialog(
                 )
 
                 Text(
-                    text = stringResource(R.string.achievements_label)
+                    text = stringResource(R.string.best_score_label) + " (Tile)",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
                 )
-
-                LazyColumn {
-
-                    items(
-                        achievements,
-                        key = {
-                            it.id
-                        }
-                    ) { achievement ->
-
-                        AchievementRow(
-                            achievement
+                
+                if (maxTile > 0) {
+                    val dateStr = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                        .format(Date(maxTileDate))
+                    
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        Text(
+                            text = maxTile.toString(),
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = GameColors.Primary
+                        )
+                        Text(
+                            text = dateStr,
+                            fontSize = 14.sp,
+                            color = GameColors.TextDark.copy(alpha = 0.6f)
                         )
                     }
+                } else {
+                    Text(
+                        text = "-",
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             }
         },
 
         confirmButton = {}
     )
-}
-
-@Composable
-private fun AchievementRow(
-    achievement: Achievement
-) {
-    val context = LocalContext.current
-    
-    // Dynamically resolve title and description from resources using the keys stored in DB
-    val title = try {
-        val resId = context.resources.getIdentifier(achievement.title, "string", context.packageName)
-        if (resId != 0) context.getString(resId) else achievement.title
-    } catch (e: Exception) {
-        achievement.title
-    }
-
-    val description = try {
-        val resId = context.resources.getIdentifier(achievement.description, "string", context.packageName)
-        if (resId != 0) context.getString(resId) else achievement.description
-    } catch (e: Exception) {
-        achievement.description
-    }
-
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    vertical = 7.dp
-                ),
-        verticalAlignment =
-            Alignment.CenterVertically
-    ) {
-
-        Icon(
-            imageVector =
-                if (achievement.unlocked) {
-                    Icons.Default.Star
-                } else {
-                    Icons.Default.Lock
-                },
-            contentDescription = null
-        )
-
-        Column(
-            modifier =
-                Modifier.padding(
-                    start = 10.dp
-                )
-        ) {
-
-            Text(
-                text = title
-            )
-
-            Text(
-                text = description
-            )
-        }
-    }
 }

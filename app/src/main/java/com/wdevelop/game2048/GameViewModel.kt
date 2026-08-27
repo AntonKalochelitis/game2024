@@ -35,18 +35,26 @@ class GameViewModel(
         val savedTiles = database.loadSavedTiles()
         return if (savedTiles != null) {
             GameEngine.restoreGame(savedTiles)
+            val currentMax = savedTiles.maxOfOrNull { it.value } ?: 0
             GameState(
                 tiles = savedTiles,
                 score = database.loadSavedScore(),
                 bestScore = loadBestScore(),
+                currentMaxTile = currentMax,
+                maxTileRecord = database.loadMaxTile(),
+                maxTileDate = database.loadMaxTileDate(),
                 winAlreadyShown = database.loadWinShown(),
                 soundEnabled = preferences.getBoolean(KEY_SOUND, true)
             )
         } else {
+            val initialTiles = GameEngine.createNewGame()
             GameState(
-                tiles = GameEngine.createNewGame(),
+                tiles = initialTiles,
                 score = 0,
                 bestScore = loadBestScore(),
+                currentMaxTile = initialTiles.maxOfOrNull { it.value } ?: 0,
+                maxTileRecord = database.loadMaxTile(),
+                maxTileDate = database.loadMaxTileDate(),
                 soundEnabled = preferences.getBoolean(KEY_SOUND, true)
             )
         }
@@ -85,6 +93,7 @@ class GameViewModel(
 
         saveBestScore(best)
 
+        val currentMax = result.tiles.maxOfOrNull { it.value } ?: 0
         val isGameOver = !GameEngine.canMove(result.tiles)
 
         if (isGameOver) {
@@ -92,6 +101,8 @@ class GameViewModel(
                 result.tiles,
                 score
             )
+            database.saveMaxTileRecord(currentMax)
+            
             if (current.soundEnabled) {
                 soundManager.playGameOver()
             }
@@ -109,6 +120,9 @@ class GameViewModel(
             tiles = result.tiles,
             score = score,
             bestScore = best,
+            currentMaxTile = currentMax,
+            maxTileRecord = database.loadMaxTile(),
+            maxTileDate = database.loadMaxTileDate(),
             isGameOver = isGameOver,
             showWinDialog = showWin,
             winAlreadyShown = current.winAlreadyShown || result.reached2048
@@ -126,13 +140,18 @@ class GameViewModel(
 
     fun newGame() {
         database.clearSavedGame()
+        val tiles = GameEngine.createNewGame()
         _state.value =
             GameState(
-                tiles =
-                    GameEngine.createNewGame(),
+                tiles = tiles,
                 score = 0,
                 bestScore =
                     loadBestScore(),
+                currentMaxTile = tiles.maxOfOrNull { it.value } ?: 0,
+                maxTileRecord =
+                    database.loadMaxTile(),
+                maxTileDate =
+                    database.loadMaxTileDate(),
                 soundEnabled =
                     _state.value.soundEnabled
             )

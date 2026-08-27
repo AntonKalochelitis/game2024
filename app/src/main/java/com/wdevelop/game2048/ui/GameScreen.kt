@@ -86,13 +86,8 @@ fun GameScreen(
                 Modifier.height(14.dp)
         )
 
-        val maxTileValue =
-            state.tiles.maxOfOrNull {
-                it.value
-            } ?: 0
-
         Text(
-            text = maxTileValue.toString(),
+            text = state.currentMaxTile.toString(),
             color = GameColors.Primary,
             fontSize = 54.sp,
             fontWeight =
@@ -151,8 +146,10 @@ fun GameScreen(
         SettingsDialog(
             soundEnabled =
                 state.soundEnabled,
-            achievements =
-                achievements,
+            maxTile =
+                state.maxTileRecord,
+            maxTileDate =
+                state.maxTileDate,
             onSoundChanged =
                 viewModel::setSoundEnabled,
             onClose =

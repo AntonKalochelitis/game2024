@@ -52,7 +52,9 @@ class AchievementDatabase(
             CREATE TABLE game_info (
                 id INTEGER PRIMARY KEY DEFAULT 1,
                 score INTEGER NOT NULL DEFAULT 0,
-                win_shown INTEGER NOT NULL DEFAULT 0
+                win_shown INTEGER NOT NULL DEFAULT 0,
+                max_tile INTEGER NOT NULL DEFAULT 0,
+                max_tile_date INTEGER NOT NULL DEFAULT 0
             )
             """.trimIndent()
         )
@@ -100,10 +102,16 @@ class AchievementDatabase(
                 CREATE TABLE game_info (
                     id INTEGER PRIMARY KEY DEFAULT 1,
                     score INTEGER NOT NULL DEFAULT 0,
-                    win_shown INTEGER NOT NULL DEFAULT 0
+                    win_shown INTEGER NOT NULL DEFAULT 0,
+                    max_tile INTEGER NOT NULL DEFAULT 0,
+                    max_tile_date INTEGER NOT NULL DEFAULT 0
                 )
                 """.trimIndent()
             )
+        }
+        if (oldVersion == 3) {
+            db.execSQL("ALTER TABLE game_info ADD COLUMN max_tile INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE game_info ADD COLUMN max_tile_date INTEGER NOT NULL DEFAULT 0")
         }
     }
 
@@ -186,6 +194,37 @@ class AchievementDatabase(
         db.insertWithOnConflict("game_info", null, infoValues, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
+    fun saveMaxTileRecord(value: Int) {
+        val currentMax = loadMaxTile()
+        if (value > currentMax) {
+            val values = ContentValues().apply {
+                put("max_tile", value)
+                put("max_tile_date", System.currentTimeMillis())
+            }
+            writableDatabase.update("game_info", values, "id = 1", null)
+        }
+    }
+
+    fun loadMaxTile(): Int {
+        var max = 0
+        val cursor = readableDatabase.query("game_info", arrayOf("max_tile"), "id = 1", null, null, null, null)
+        if (cursor.moveToFirst()) {
+            max = cursor.getInt(0)
+        }
+        cursor.close()
+        return max
+    }
+
+    fun loadMaxTileDate(): Long {
+        var date = 0L
+        val cursor = readableDatabase.query("game_info", arrayOf("max_tile_date"), "id = 1", null, null, null, null)
+        if (cursor.moveToFirst()) {
+            date = cursor.getLong(0)
+        }
+        cursor.close()
+        return date
+    }
+
     fun getAchievements(): List<Achievement> {
         val result = mutableListOf<Achievement>()
         val cursor = readableDatabase.query("achievements", null, null, null, null, null, "id DESC")
@@ -209,6 +248,6 @@ class AchievementDatabase(
 
     companion object {
         private const val DATABASE_NAME = "game_2048.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
     }
 }
