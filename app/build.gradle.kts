@@ -14,8 +14,8 @@ android {
         minSdk = 23
         targetSdk = 37
 
-        versionCode = 7
-        versionName = "1.7"
+        versionCode = 8
+        versionName = "1.8"
     }
 
     buildFeatures {
@@ -56,6 +56,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
+
+    // AdMob SDK
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
 
     debugImplementation(
         "androidx.compose.ui:ui-tooling"
