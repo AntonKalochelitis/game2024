@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.wdevelop.game2048.TileModel
 
 data class Achievement(
@@ -13,80 +14,42 @@ data class Achievement(
     val unlocked: Boolean
 )
 
-class AchievementDatabase(
+class AchievementDatabase private constructor(
     context: Context
 ) : SQLiteOpenHelper(
-    context,
+    context.applicationContext,
     DATABASE_NAME,
     null,
     DATABASE_VERSION
 ) {
 
-    override fun onCreate(
-        db: SQLiteDatabase
-    ) {
-        db.execSQL(
-            """
-            CREATE TABLE achievements (
-                id INTEGER PRIMARY KEY,
-                title TEXT NOT NULL,
-                description TEXT NOT NULL,
-                unlocked INTEGER NOT NULL DEFAULT 0
-            )
-            """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            CREATE TABLE tiles (
-                id INTEGER PRIMARY KEY,
-                tile_value INTEGER NOT NULL,
-                tile_row INTEGER NOT NULL,
-                tile_col INTEGER NOT NULL
-            )
-            """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            CREATE TABLE game_info (
-                id INTEGER PRIMARY KEY DEFAULT 1,
-                score INTEGER NOT NULL DEFAULT 0,
-                win_shown INTEGER NOT NULL DEFAULT 0,
-                max_tile INTEGER NOT NULL DEFAULT 0,
-                max_tile_date INTEGER NOT NULL DEFAULT 0
-            )
-            """.trimIndent()
-        )
-
-        val achievements = listOf(
-            Triple(1, "ach_1_title", "ach_1_desc"),
-            Triple(2, "ach_2_title", "ach_2_desc"),
-            Triple(3, "ach_3_title", "ach_3_desc"),
-            Triple(4, "ach_4_title", "ach_4_desc"),
-            Triple(5, "ach_5_title", "ach_5_desc"),
-            Triple(6, "ach_6_title", "ach_6_desc")
-        )
-
-        achievements.forEach { item ->
-            val values = ContentValues().apply {
-                put("id", item.first)
-                put("title", item.second)
-                put("description", item.third)
-                put("unlocked", 0)
-            }
-            db.insert("achievements", null, values)
+    override fun onConfigure(db: SQLiteDatabase) {
+        super.onConfigure(db)
+        try {
+            // Enable Write-Ahead Logging for better concurrency and stability on Samsung
+            db.enableWriteAheadLogging()
+            // Set synchronous mode to NORMAL for better performance
+            db.execSQL("PRAGMA synchronous = NORMAL")
+        } catch (e: Exception) {
+            Log.e("Database", "Error in onConfigure", e)
         }
     }
 
-    override fun onUpgrade(
-        db: SQLiteDatabase,
-        oldVersion: Int,
-        newVersion: Int
+    override fun onCreate(
+        db: SQLiteDatabase
     ) {
-        if (oldVersion < 3) {
-            db.execSQL("DROP TABLE IF EXISTS tiles")
-            db.execSQL("DROP TABLE IF EXISTS game_info")
+        try {
+            db.execSQL(
+                """
+                CREATE TABLE achievements (
+                    id INTEGER PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    unlocked INTEGER NOT NULL DEFAULT 0
+                )
+                """.trimIndent()
+            )
+
             db.execSQL(
                 """
                 CREATE TABLE tiles (
@@ -97,6 +60,7 @@ class AchievementDatabase(
                 )
                 """.trimIndent()
             )
+
             db.execSQL(
                 """
                 CREATE TABLE game_info (
@@ -108,10 +72,40 @@ class AchievementDatabase(
                 )
                 """.trimIndent()
             )
+
+            val achievements = listOf(
+                Triple(1, "ach_1_title", "ach_1_desc"),
+                Triple(2, "ach_2_title", "ach_2_desc"),
+                Triple(3, "ach_3_title", "ach_3_desc"),
+                Triple(4, "ach_4_title", "ach_4_desc"),
+                Triple(5, "ach_5_title", "ach_5_desc"),
+                Triple(6, "ach_6_title", "ach_6_desc")
+            )
+
+            achievements.forEach { item ->
+                val values = ContentValues().apply {
+                    put("id", item.first)
+                    put("title", item.second)
+                    put("description", item.third)
+                    put("unlocked", 0)
+                }
+                db.insert("achievements", null, values)
+            }
+        } catch (e: Exception) {
+            Log.e("Database", "Error in onCreate", e)
         }
-        if (oldVersion == 3) {
-            db.execSQL("ALTER TABLE game_info ADD COLUMN max_tile INTEGER NOT NULL DEFAULT 0")
-            db.execSQL("ALTER TABLE game_info ADD COLUMN max_tile_date INTEGER NOT NULL DEFAULT 0")
+    }
+
+    override fun onUpgrade(
+        db: SQLiteDatabase,
+        oldVersion: Int,
+        newVersion: Int
+    ) {
+        if (oldVersion < 4) {
+            db.execSQL("DROP TABLE IF EXISTS tiles")
+            db.execSQL("DROP TABLE IF EXISTS game_info")
+            db.execSQL("DROP TABLE IF EXISTS achievements")
+            onCreate(db)
         }
     }
 
@@ -138,6 +132,8 @@ class AchievementDatabase(
             db.insertWithOnConflict("game_info", null, infoValues, SQLiteDatabase.CONFLICT_REPLACE)
             
             db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            Log.e("Database", "Error saving game", e)
         } finally {
             db.endTransaction()
         }
@@ -145,109 +141,156 @@ class AchievementDatabase(
 
     fun loadSavedTiles(): List<TileModel>? {
         val result = mutableListOf<TileModel>()
-        val cursor = readableDatabase.query("tiles", null, null, null, null, null, null)
-        if (cursor.count == 0) {
-            cursor.close()
-            return null
-        }
-        cursor.use {
-            while (it.moveToNext()) {
-                result += TileModel(
-                    id = it.getLong(it.getColumnIndexOrThrow("id")),
-                    value = it.getInt(it.getColumnIndexOrThrow("tile_value")),
-                    row = it.getInt(it.getColumnIndexOrThrow("tile_row")),
-                    column = it.getInt(it.getColumnIndexOrThrow("tile_col"))
-                )
+        return try {
+            val cursor = readableDatabase.query("tiles", null, null, null, null, null, null)
+            if (cursor.count == 0) {
+                cursor.close()
+                null
+            } else {
+                cursor.use {
+                    while (it.moveToNext()) {
+                        result += TileModel(
+                            id = it.getLong(it.getColumnIndexOrThrow("id")),
+                            value = it.getInt(it.getColumnIndexOrThrow("tile_value")),
+                            row = it.getInt(it.getColumnIndexOrThrow("tile_row")),
+                            column = it.getInt(it.getColumnIndexOrThrow("tile_col"))
+                        )
+                    }
+                }
+                result
             }
+        } catch (e: Exception) {
+            Log.e("Database", "Error loading tiles", e)
+            null
         }
-        return result
     }
 
     fun loadSavedScore(): Int {
         var score = 0
-        val cursor = readableDatabase.query("game_info", arrayOf("score"), "id = 1", null, null, null, null)
-        if (cursor.moveToFirst()) {
-            score = cursor.getInt(0)
+        try {
+            val cursor = readableDatabase.query("game_info", arrayOf("score"), "id = 1", null, null, null, null)
+            if (cursor.moveToFirst()) {
+                score = cursor.getInt(0)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("Database", "Error loading score", e)
         }
-        cursor.close()
         return score
     }
 
     fun loadWinShown(): Boolean {
         var shown = false
-        val cursor = readableDatabase.query("game_info", arrayOf("win_shown"), "id = 1", null, null, null, null)
-        if (cursor.moveToFirst()) {
-            shown = cursor.getInt(0) == 1
+        try {
+            val cursor = readableDatabase.query("game_info", arrayOf("win_shown"), "id = 1", null, null, null, null)
+            if (cursor.moveToFirst()) {
+                shown = cursor.getInt(0) == 1
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("Database", "Error loading winShown", e)
         }
-        cursor.close()
         return shown
     }
 
     fun clearSavedGame() {
-        val db = writableDatabase
-        db.delete("tiles", null, null)
-        val infoValues = ContentValues().apply {
-            put("id", 1)
-            put("score", 0)
-            put("win_shown", 0)
+        try {
+            val db = writableDatabase
+            db.delete("tiles", null, null)
+            val infoValues = ContentValues().apply {
+                put("id", 1)
+                put("score", 0)
+                put("win_shown", 0)
+            }
+            db.insertWithOnConflict("game_info", null, infoValues, SQLiteDatabase.CONFLICT_REPLACE)
+        } catch (e: Exception) {
+            Log.e("Database", "Error clearing game", e)
         }
-        db.insertWithOnConflict("game_info", null, infoValues, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
     fun saveMaxTileRecord(value: Int) {
-        val currentMax = loadMaxTile()
-        if (value > currentMax) {
-            val values = ContentValues().apply {
-                put("max_tile", value)
-                put("max_tile_date", System.currentTimeMillis())
+        try {
+            val currentMax = loadMaxTile()
+            if (value > currentMax) {
+                val values = ContentValues().apply {
+                    put("max_tile", value)
+                    put("max_tile_date", System.currentTimeMillis())
+                }
+                writableDatabase.update("game_info", values, "id = 1", null)
             }
-            writableDatabase.update("game_info", values, "id = 1", null)
+        } catch (e: Exception) {
+            Log.e("Database", "Error saving max tile", e)
         }
     }
 
     fun loadMaxTile(): Int {
         var max = 0
-        val cursor = readableDatabase.query("game_info", arrayOf("max_tile"), "id = 1", null, null, null, null)
-        if (cursor.moveToFirst()) {
-            max = cursor.getInt(0)
+        try {
+            val cursor = readableDatabase.query("game_info", arrayOf("max_tile"), "id = 1", null, null, null, null)
+            if (cursor.moveToFirst()) {
+                max = cursor.getInt(0)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("Database", "Error loading max tile", e)
         }
-        cursor.close()
         return max
     }
 
     fun loadMaxTileDate(): Long {
         var date = 0L
-        val cursor = readableDatabase.query("game_info", arrayOf("max_tile_date"), "id = 1", null, null, null, null)
-        if (cursor.moveToFirst()) {
-            date = cursor.getLong(0)
+        try {
+            val cursor = readableDatabase.query("game_info", arrayOf("max_tile_date"), "id = 1", null, null, null, null)
+            if (cursor.moveToFirst()) {
+                date = cursor.getLong(0)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("Database", "Error loading max tile date", e)
         }
-        cursor.close()
         return date
     }
 
     fun getAchievements(): List<Achievement> {
         val result = mutableListOf<Achievement>()
-        val cursor = readableDatabase.query("achievements", null, null, null, null, null, "id DESC")
-        cursor.use {
-            while (it.moveToNext()) {
-                result += Achievement(
-                    id = it.getInt(it.getColumnIndexOrThrow("id")),
-                    title = it.getString(it.getColumnIndexOrThrow("title")),
-                    description = it.getString(it.getColumnIndexOrThrow("description")),
-                    unlocked = it.getInt(it.getColumnIndexOrThrow("unlocked")) == 1
-                )
+        try {
+            val cursor = readableDatabase.query("achievements", null, null, null, null, null, "id DESC")
+            cursor.use {
+                while (it.moveToNext()) {
+                    result += Achievement(
+                        id = it.getInt(it.getColumnIndexOrThrow("id")),
+                        title = it.getString(it.getColumnIndexOrThrow("title")),
+                        description = it.getString(it.getColumnIndexOrThrow("description")),
+                        unlocked = it.getInt(it.getColumnIndexOrThrow("unlocked")) == 1
+                    )
+                }
             }
+        } catch (e: Exception) {
+            Log.e("Database", "Error getting achievements", e)
         }
         return result
     }
 
     fun unlock(achievementId: Int) {
-        val values = ContentValues().apply { put("unlocked", 1) }
-        writableDatabase.update("achievements", values, "id = ?", arrayOf(achievementId.toString()))
+        try {
+            val values = ContentValues().apply { put("unlocked", 1) }
+            writableDatabase.update("achievements", values, "id = ?", arrayOf(achievementId.toString()))
+        } catch (e: Exception) {
+            Log.e("Database", "Error unlocking achievement", e)
+        }
     }
 
     companion object {
         private const val DATABASE_NAME = "game_2048.db"
         private const val DATABASE_VERSION = 4
+
+        @Volatile
+        private var instance: AchievementDatabase? = null
+
+        fun getInstance(context: Context): AchievementDatabase {
+            return instance ?: synchronized(this) {
+                instance ?: AchievementDatabase(context).also { instance = it }
+            }
+        }
     }
 }

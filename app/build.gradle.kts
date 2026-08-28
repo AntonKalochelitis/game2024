@@ -5,17 +5,14 @@ plugins {
 
 android {
     namespace = "com.wdevelop.game2048"
-
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.wdevelop.game2048"
-
         minSdk = 23
-        targetSdk = 37
-
-        versionCode = 9
-        versionName = "1.9"
+        targetSdk = 36
+        versionCode = 10
+        versionName = "1.10"
     }
 
     buildFeatures {
@@ -47,9 +44,7 @@ android {
 }
 
 dependencies {
-    val composeBom =
-        platform("androidx.compose:compose-bom:2024.12.01")
-
+    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
     implementation(composeBom)
 
     implementation("androidx.activity:activity-compose:1.10.0")
@@ -63,10 +58,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
-    // AdMob SDK - Stable version for Android 15
+    // AdMob SDK - Stable version for Android 15/16
     implementation("com.google.android.gms:play-services-ads:23.4.0")
 
-    debugImplementation(
-        "androidx.compose.ui:ui-tooling"
-    )
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }

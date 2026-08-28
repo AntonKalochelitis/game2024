@@ -1,6 +1,5 @@
 package com.wdevelop.game2048.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,16 @@ fun GameScreen(
     onShowInterstitial: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+    val achievements by viewModel.achievements.collectAsState()
+
+    if (state == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = GameColors.Primary)
+        }
+        return
+    }
+
+    val currentState = state!!
 
     Column(
         modifier = Modifier
@@ -65,7 +76,7 @@ fun GameScreen(
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = state.currentMaxTile.toString(),
+            text = currentState.currentMaxTile.toString(),
             color = GameColors.Primary,
             fontSize = 54.sp,
             fontWeight = FontWeight.ExtraBold
@@ -74,14 +85,14 @@ fun GameScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         ScorePanel(
-            score = state.score,
-            best = state.bestScore
+            score = currentState.score,
+            best = currentState.bestScore
         )
 
         Spacer(modifier = Modifier.height(18.dp))
 
         GameBoard(
-            tiles = state.tiles,
+            tiles = currentState.tiles,
             onMove = viewModel::move,
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,17 +107,17 @@ fun GameScreen(
         }
     }
 
-    if (state.showSettings) {
+    if (currentState.showSettings) {
         SettingsDialog(
-            soundEnabled = state.soundEnabled,
-            maxTile = state.maxTileRecord,
-            maxTileDate = state.maxTileDate,
+            soundEnabled = currentState.soundEnabled,
+            maxTile = currentState.maxTileRecord,
+            maxTileDate = currentState.maxTileDate,
             onSoundChanged = viewModel::setSoundEnabled,
             onClose = viewModel::closeSettings
         )
     }
 
-    if (state.showWinDialog) {
+    if (currentState.showWinDialog) {
         WinDialog(
             onContinue = viewModel::continueAfterWin,
             onRestart = {
@@ -116,7 +127,7 @@ fun GameScreen(
         )
     }
 
-    if (state.isGameOver) {
+    if (currentState.isGameOver) {
         GameOverDialog(
             onRestart = {
                 onShowInterstitial()
@@ -133,20 +144,11 @@ fun AdMobBanner() {
             .fillMaxWidth()
             .height(60.dp),
         factory = { context ->
-            try {
-                AdView(context).apply {
-                    setAdSize(AdSize.BANNER)
-                    adUnitId = AdConfig.BANNER_ID
-                    loadAd(AdRequest.Builder().build())
-                }
-            } catch (e: Exception) {
-                Log.e("AdMob", "Error creating AdView banner", e)
-                // Возвращаем пустую вью, чтобы не падать
-                android.view.View(context)
+            AdView(context).apply {
+                setAdSize(AdSize.BANNER)
+                adUnitId = AdConfig.BANNER_ID
+                loadAd(AdRequest.Builder().build())
             }
-        },
-        update = { adView ->
-            // Можно добавить логику обновления, если нужно
         }
     )
 }

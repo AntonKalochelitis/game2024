@@ -1,9 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Вставляем ваше основное изображение по центру -->
-    <item
-        android:drawable="@drawable/ic_app_main"
-        android:gravity="center"
-        android:width="108dp"
-        android:height="108dp" />
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Glowing Background Effect -->
+    <path
+        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="40"
+                android:type="radial">
+                <item android:color="#406C4CC5" android:offset="0" />
+                <item android:color="#006C4CC5" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Main Tile Shape (Rounded Square) -->
+    <path
+        android:fillColor="#6C4CC5"
+        android:pathData="M30,30h48a6,6 0,0 1,6 6v48a6,6 0,0 1,-6 6h-48a6,6 0,0 1,-6 -6v-48a6,6 0,0 1,6 -6z" />
+
+    <!-- 2048 Text (Simplified Vector Shapes) -->
+    <!-- 2 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,45h8v2h-8v4h8v2h-10v-8h8v-2h-8v-2h10v2h-8z" />
+    <!-- 0 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,43h6v12h-6z M50,45v8h2v-8z" />
+    <!-- 4 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,43v6h4v-6h2v12h-2v-4h-4v4h-2v-12z M58,45v2h2v-2z" />
+    <!-- 8 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66,43h6v5h-6z M66,50h6v5h-6z M68,45v1h2v-1z M68,52v1h2v-1z" />
+
+    <!-- Decorative Shine -->
+    <path
+        android:pathData="M35,35 L73,35"
+        android:strokeWidth="1"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="35"
+                android:startY="35"
+                android:endX="73"
+                android:endY="35"
+                android:type="linear">
+                <item android:color="#00FFFFFF" android:offset="0" />
+                <item android:color="#A0FFFFFF" android:offset="0.5" />
+                <item android:color="#00FFFFFF" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+</vector>
