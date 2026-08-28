@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.wdevelop.game2048"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.wdevelop.game2048"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 10
         versionName = "1.10"
     }
