@@ -3,12 +3,15 @@ package com.wdevelop.game2048
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.wdevelop.game2048.data.Achievement
 import com.wdevelop.game2048.data.AchievementDatabase
 import com.wdevelop.game2048.ui.SoundManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class GameViewModel(
     application: Application
@@ -25,11 +28,21 @@ class GameViewModel(
 
     private val soundManager = SoundManager(application)
 
-    private val _state =
-        MutableStateFlow(initialState())
+    private val _state = MutableStateFlow(initialState())
+    val state: StateFlow<GameState> = _state.asStateFlow()
 
-    val state: StateFlow<GameState> =
-        _state.asStateFlow()
+    private val _achievements = MutableStateFlow<List<Achievement>>(emptyList())
+    val achievements: StateFlow<List<Achievement>> = _achievements.asStateFlow()
+
+    init {
+        loadAchievements()
+    }
+
+    private fun loadAchievements() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _achievements.value = database.getAchievements()
+        }
+    }
 
     private fun initialState(): GameState {
         val savedTiles = database.loadSavedTiles()
@@ -61,57 +74,34 @@ class GameViewModel(
     }
 
     fun move(direction: Direction) {
-
         val current = _state.value
+        if (current.isGameOver) return
 
-        if (current.isGameOver) {
-            return
-        }
-
-        val result =
-            GameEngine.move(
-                current.tiles,
-                direction
-            )
-
-        if (!result.moved) {
-            return
-        }
+        val result = GameEngine.move(current.tiles, direction)
+        if (!result.moved) return
 
         if (current.soundEnabled) {
             soundManager.playMove()
         }
 
-        val score =
-            current.score + result.scoreAdded
-
-        val best =
-            maxOf(
-                current.bestScore,
-                score
-            )
-
+        val score = current.score + result.scoreAdded
+        val best = maxOf(current.bestScore, score)
         saveBestScore(best)
 
         val currentMax = result.tiles.maxOfOrNull { it.value } ?: 0
         val isGameOver = !GameEngine.canMove(result.tiles)
 
         if (isGameOver) {
-            unlockAchievements(
-                result.tiles,
-                score
-            )
+            unlockAchievements(result.tiles, score)
             database.saveMaxTileRecord(currentMax)
+            loadAchievements() // Refresh after potential unlock
             
             if (current.soundEnabled) {
                 soundManager.playGameOver()
             }
         }
 
-        val showWin =
-            result.reached2048 &&
-                !current.winAlreadyShown
-        
+        val showWin = result.reached2048 && !current.winAlreadyShown
         if (showWin && current.soundEnabled) {
             soundManager.playWin()
         }
@@ -132,132 +122,60 @@ class GameViewModel(
         database.saveGame(nextState.tiles, nextState.score, nextState.winAlreadyShown)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        soundManager.release()
-    }
-
-
     fun newGame() {
         database.clearSavedGame()
         val tiles = GameEngine.createNewGame()
-        _state.value =
-            GameState(
-                tiles = tiles,
-                score = 0,
-                bestScore =
-                    loadBestScore(),
-                currentMaxTile = tiles.maxOfOrNull { it.value } ?: 0,
-                maxTileRecord =
-                    database.loadMaxTile(),
-                maxTileDate =
-                    database.loadMaxTileDate(),
-                soundEnabled =
-                    _state.value.soundEnabled
-            )
-    }
-
-    fun openSettings() {
-
-        _state.value =
-            _state.value.copy(
-                showSettings = true
-            )
-    }
-
-    fun closeSettings() {
-
-        _state.value =
-            _state.value.copy(
-                showSettings = false
-            )
-    }
-
-    fun setSoundEnabled(
-        enabled: Boolean
-    ) {
-
-        preferences.edit()
-            .putBoolean(
-                KEY_SOUND,
-                enabled
-            )
-            .apply()
-
-        _state.value =
-            _state.value.copy(
-                soundEnabled = enabled
-            )
-    }
-
-    fun continueAfterWin() {
-
-        _state.value =
-            _state.value.copy(
-                showWinDialog = false
-            )
-    }
-
-    fun getAchievements():
-        List<Achievement> =
-        database.getAchievements()
-
-    private fun unlockAchievements(
-        tiles: List<TileModel>,
-        score: Int
-    ) {
-
-        val maxValue =
-            tiles.maxOfOrNull {
-                it.value
-            } ?: 0
-
-        if (maxValue >= 128) {
-            database.unlock(1)
-        }
-
-        if (maxValue >= 256) {
-            database.unlock(2)
-        }
-
-        if (maxValue >= 512) {
-            database.unlock(3)
-        }
-
-        if (maxValue >= 1024) {
-            database.unlock(4)
-        }
-
-        if (maxValue >= 2048) {
-            database.unlock(5)
-        }
-
-        if (score >= 10000) {
-            database.unlock(6)
-        }
-    }
-
-    private fun loadBestScore(): Int {
-        return preferences.getInt(
-            KEY_BEST_SCORE,
-            0
+        _state.value = GameState(
+            tiles = tiles,
+            score = 0,
+            bestScore = loadBestScore(),
+            currentMaxTile = tiles.maxOfOrNull { it.value } ?: 0,
+            maxTileRecord = database.loadMaxTile(),
+            maxTileDate = database.loadMaxTileDate(),
+            soundEnabled = _state.value.soundEnabled
         )
     }
 
-    private fun saveBestScore(
-        score: Int
-    ) {
-        preferences.edit()
-            .putInt(
-                KEY_BEST_SCORE,
-                score
-            )
-            .apply()
+    fun openSettings() {
+        loadAchievements() // Refresh when opening settings
+        _state.value = _state.value.copy(showSettings = true)
+    }
+
+    fun closeSettings() {
+        _state.value = _state.value.copy(showSettings = false)
+    }
+
+    fun setSoundEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_SOUND, enabled).apply()
+        _state.value = _state.value.copy(soundEnabled = enabled)
+    }
+
+    fun continueAfterWin() {
+        _state.value = _state.value.copy(showWinDialog = false)
+    }
+
+    private fun unlockAchievements(tiles: List<TileModel>, score: Int) {
+        val maxValue = tiles.maxOfOrNull { it.value } ?: 0
+        if (maxValue >= 128) database.unlock(1)
+        if (maxValue >= 256) database.unlock(2)
+        if (maxValue >= 512) database.unlock(3)
+        if (maxValue >= 1024) database.unlock(4)
+        if (maxValue >= 2048) database.unlock(5)
+        if (score >= 10000) database.unlock(6)
+    }
+
+    private fun loadBestScore(): Int = preferences.getInt(KEY_BEST_SCORE, 0)
+
+    private fun saveBestScore(score: Int) {
+        preferences.edit().putInt(KEY_BEST_SCORE, score).apply()
+    }
+
+    override fun onCleared() {
+        soundManager.release()
     }
 
     private companion object {
         const val KEY_BEST_SCORE = "best_score"
-        private const val KEY_SOUND =
-            "sound_enabled"
+        const val KEY_SOUND = "sound_enabled"
     }
 }

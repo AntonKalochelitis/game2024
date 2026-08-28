@@ -14,8 +14,8 @@ android {
         minSdk = 23
         targetSdk = 37
 
-        versionCode = 8
-        versionName = "1.8"
+        versionCode = 9
+        versionName = "1.9"
     }
 
     buildFeatures {
@@ -30,25 +30,31 @@ android {
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             optimization {
-                enable = true // Enables code and resource optimizations.
+                enable = true
             }
             ndk {
                 debugSymbolLevel = "FULL"
             }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
 dependencies {
     val composeBom =
-        platform("androidx.compose:compose-bom:2026.08.00")
+        platform("androidx.compose:compose-bom:2024.12.01")
 
     implementation(composeBom)
 
-    implementation("androidx.activity:activity-compose:1.13.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation("androidx.activity:activity-compose:1.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
@@ -57,8 +63,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
-    // AdMob SDK
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    // AdMob SDK - Stable version for Android 15
+    implementation("com.google.android.gms:play-services-ads:23.4.0")
 
     debugImplementation(
         "androidx.compose.ui:ui-tooling"

@@ -1,5 +1,6 @@
 package com.wdevelop.game2048.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -34,6 +36,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.wdevelop.game2048.AdConfig
 import com.wdevelop.game2048.GameViewModel
 import com.wdevelop.game2048.R
 
@@ -55,10 +58,6 @@ fun GameScreen(
         Header(
             onSettings = viewModel::openSettings,
             onNewGame = {
-                // For the top-right button, we just start new game or maybe show ad too?
-                // Request said "After clicking restart in game over dialog". 
-                // I'll keep top-right as immediate restart for UX, or also with ad if desired.
-                // But the instruction was specific about the dialog.
                 viewModel.newGame()
             }
         )
@@ -91,8 +90,10 @@ fun GameScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Рекламный баннер AdMob в самом низу
-        AdMobBanner()
+        // Рекламный баннер AdMob в самом низу (только если включена реклама)
+        if (AdConfig.AD_ENABLED) {
+            AdMobBanner()
+        }
     }
 
     if (state.showSettings) {
@@ -132,11 +133,20 @@ fun AdMobBanner() {
             .fillMaxWidth()
             .height(60.dp),
         factory = { context ->
-            AdView(context).apply {
-                setAdSize(AdSize.BANNER)
-                adUnitId = "ca-app-pub-3940256099942544/6300978111"
-                loadAd(AdRequest.Builder().build())
+            try {
+                AdView(context).apply {
+                    setAdSize(AdSize.BANNER)
+                    adUnitId = AdConfig.BANNER_ID
+                    loadAd(AdRequest.Builder().build())
+                }
+            } catch (e: Exception) {
+                Log.e("AdMob", "Error creating AdView banner", e)
+                // Возвращаем пустую вью, чтобы не падать
+                android.view.View(context)
             }
+        },
+        update = { adView ->
+            // Можно добавить логику обновления, если нужно
         }
     )
 }
