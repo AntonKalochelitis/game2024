@@ -23,9 +23,6 @@ class MainActivity : ComponentActivity() {
     private var interstitialAd: InterstitialAd? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Инициализируем перехватчик ПЕРВЫМ делом
-        CrashHandler.init(applicationContext)
-        
         super.onCreate(savedInstanceState)
 
         val lastCrash = CrashHandler.getLatestCrash(applicationContext)

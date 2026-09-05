@@ -11,8 +11,8 @@ android {
         applicationId = "com.wdevelop.game2048"
         minSdk = 23
         targetSdk = 37
-        versionCode = 10
-        versionName = "1.10"
+        versionCode = 12
+        versionName = "1.12"
     }
 
     buildFeatures {
